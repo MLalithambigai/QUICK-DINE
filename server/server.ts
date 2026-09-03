@@ -5,6 +5,7 @@ import connectDB from './config/db.js';
 import authRouter from './routes/authRoute.js';
 import { NextFunction } from 'express';
 import restaurantRouter from './routes/restaurantRoutes.js';
+import bookingRouter from './routes/bookingRoutes.js';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/auth', authRouter);
 app.use('/api/restaurants', restaurantRouter);
+app.use('/api/bookings', bookingRouter);
 
 // Global Error Handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
