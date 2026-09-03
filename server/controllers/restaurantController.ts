@@ -2,6 +2,7 @@ import { Restaurant } from '../models/Restaurant.js';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
+import { Booking } from '../models/Booking.js';
 
 interface RestaurantQuery {
   search?: string;
@@ -25,8 +26,6 @@ interface AvailabilitySlot {
   availableSeats: number;
   isAvailable: boolean;
 }
-
-const { Booking }: { Booking: any } = require('../models/Booking.js');
 
 // Get all restaurants with search and filters
 // GET /api/restaurants
