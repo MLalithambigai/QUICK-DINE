@@ -6,6 +6,7 @@ import authRouter from './routes/authRoute.js';
 import { NextFunction } from 'express';
 import restaurantRouter from './routes/restaurantRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
+import ownerRouter from './routes/ownerRoute.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/auth', authRouter);
 app.use('/api/restaurants', restaurantRouter);
 app.use('/api/bookings', bookingRouter);
+app.use('/api/owner', ownerRouter);
 
 // Global Error Handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
