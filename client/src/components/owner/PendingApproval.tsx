@@ -10,6 +10,13 @@ export default function PendingApproval({ restaurant }: PendingApprovalProps) {
         <div className="max-w-xl mx-auto bg-white border border-outline-variant/20 p-8 text-center shadow-sm rounded-md space-y-6">
             <Info size={40} className="mx-auto text-secondary animate-pulse" />
             <h2 className="font-display text-xl text-primary">Registration Pending Approval</h2>
+            {restaurant?.image && (
+                <img
+                    src={restaurant.image}
+                    alt={`${restaurant.name} restaurant`}
+                    className="w-full aspect-[16/7] object-cover rounded-sm"
+                />
+            )}
             <p className="text-sm text-black/55 leading-relaxed">
                 Thank you for registering <span className="text-black">{restaurant?.name}</span>. Your profile details and slots listing are
                 currently under review by our Master Admin.

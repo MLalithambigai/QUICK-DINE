@@ -5,12 +5,13 @@ import Navbar from "../../components/Navbar.tsx";
 import Footer from "../../components/Footer.tsx";
 import Loader from "../../components/Loader.tsx";
 import { CalendarIcon, SettingsIcon } from "lucide-react";
+import toast from "react-hot-toast";
 import RestaurantWizard from "../../components/owner/RestaurantWizard.tsx";
 import PendingApproval from "../../components/owner/PendingApproval.tsx";
 import RequestRejected from "../../components/owner/RequestRejected.tsx";
 import OwnerBookings from "../../components/owner/OwnerBookings.tsx";
 import OwnerProfileDetails from "../../components/owner/OwnerProfileDetails.tsx";
-import { dummyMyBookingsData, dummyRestaurant } from "../../assets/assets.ts";
+import api from "../../lib/api.ts";
 
 export default function OwnerDashboard() {
     const { logout } = useAppContext();
@@ -20,9 +21,29 @@ export default function OwnerDashboard() {
     const [activeTab, setActiveTab] = useState<"bookings" | "details">("bookings");
 
     const fetchOwnerData = async () => {
-        setRestaurant(dummyRestaurant[0]);
-        setBookings(dummyMyBookingsData);
-        setLoading(false);
+        try {
+            setLoading(true);
+            const restaurantResponse = await api.get("/owner/restaurant");
+            setRestaurant(restaurantResponse.data);
+
+            if(restaurantResponse.data){
+                if(restaurantResponse.data.status === "approved"){
+                    // Fetch bookings
+                    const bookingsResponse = await api.get("/owner/bookings");
+                setBookings(bookingsResponse.data);
+
+                }
+            }
+
+        } catch (error: any) {
+            if (error?.response?.status !== 404) {
+                toast.error(error?.response?.data?.message || "Failed to load restaurant profile");
+            }
+            setRestaurant(null);
+            setBookings([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {

@@ -6,7 +6,8 @@ import { Booking } from '../models/Booking.js';
 
 interface RestaurantQuery {
   search?: string;
-  priceRange?: string;
+  priceRange?: string | string[];
+  cuisine?: string | string[];
   rating?: string;
   location?: string;
   sort?: 'rating' | 'price_low' | 'price_high' | string;
@@ -34,7 +35,7 @@ export const getRestaurants = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { search, priceRange, rating, location, sort } =
+    const { search, priceRange, cuisine, rating, location, sort } =
       req.query as Partial<RestaurantQuery>;
 
     // Build query object
@@ -46,6 +47,18 @@ export const getRestaurants = async (
         { tags: { $regex: search, $options: 'i' } },
         { location: { $regex: search, $options: 'i' } },
       ];
+    }
+
+    if (cuisine) {
+      const selectedCuisines = Array.isArray(cuisine) ? cuisine : [cuisine];
+      queryObj.cuisine = { $in: selectedCuisines };
+    }
+
+    if (priceRange) {
+      const selectedPriceRanges = Array.isArray(priceRange)
+        ? priceRange
+        : [priceRange];
+      queryObj.priceRange = { $in: selectedPriceRanges };
     }
 
     if (rating) {
@@ -140,8 +153,9 @@ export const getRestaurantBySlug = async (
           .json({ message: 'Restaurant not found or pending approval' });
         return;
       }
-      res.json(restaurant);
     }
+
+    res.json(restaurant);
   } catch (error: any) {
     console.error(error);
     res.status(400).json({ message: error.message });

@@ -1,6 +1,6 @@
+import 'dotenv/config';
 import express, { type Request, type Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRouter from './routes/authRoute.js';
 import { NextFunction } from 'express';
@@ -8,8 +8,6 @@ import restaurantRouter from './routes/restaurantRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
 import ownerRouter from './routes/ownerRoute.js';
 import adminRouter from './routes/adminRoutes.js';
-
-dotenv.config();
 
 const app = express();
 

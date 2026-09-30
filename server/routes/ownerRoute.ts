@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getOwnerRestaurant,
   createOwnerRestaurant,
+  updateOwnerRestaurant,
   getOwnerBookings,
   updateBookingStatus,
 } from '../controllers/ownerController.js';
@@ -18,7 +19,7 @@ ownerRouter.post('/restaurant', upload.single('image'), createOwnerRestaurant);
 ownerRouter.put(
   '/restaurant/:id',
   upload.single('image'),
-  createOwnerRestaurant,
+  updateOwnerRestaurant,
 );
 ownerRouter.get('/bookings', getOwnerBookings);
 ownerRouter.put('/bookings/:id/status', updateBookingStatus);

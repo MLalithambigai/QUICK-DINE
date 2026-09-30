@@ -19,8 +19,7 @@ const uploadToCloudinary = (
     const stream = cloudinary.uploader.upload_stream(
       { folder: 'QuickDine' },
       (error, result) => {
-        if (error) return;
-        reject(error);
+        if (error) return reject(error);
         if (!result) return reject(new Error('Upload failed'));
         resolve({ secure_url: result.secure_url });
       },
@@ -86,7 +85,6 @@ export const createOwnerRestaurant = async (
       !location ||
       !address ||
       !chef ||
-      !tags ||
       !availableSlots ||
       !totalSeats
     ) {
@@ -119,7 +117,10 @@ export const createOwnerRestaurant = async (
     // Setup parsed tags and slots
     const parsedTags =
       typeof tags === 'string'
-        ? tags.split(',').map((t) => t.trim())
+        ? tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
         : tags || [];
 
     const parsedSlots =
@@ -186,6 +187,7 @@ export const updateOwnerRestaurant = async (
     if (location) restaurant.location = location;
     if (address) restaurant.address = address;
     if (chef) restaurant.chef = chef;
+    if (totalSeats) restaurant.totalSeats = Number(totalSeats);
     if (tags) {
       restaurant.tags =
         typeof tags === 'string' ? tags.split(',').map((t) => t.trim()) : tags;
@@ -246,7 +248,10 @@ export const updateBookingStatus = async (
 ): Promise<void> => {
   try {
     const { status } = req.body;
-    if (!status || !['pending', 'confirmed', 'cancelled'].includes(status)) {
+    if (
+      !status ||
+      !['pending', 'confirmed', 'cancelled', 'completed'].includes(status)
+    ) {
       res.status(400).json({ message: 'Invalid status' });
       return;
     }
