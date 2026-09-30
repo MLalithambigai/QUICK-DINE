@@ -8,7 +8,8 @@ import RestaurantCard from "../components/RestaurantCard.tsx";
 import AuthModal from "../components/AuthModal.tsx";
 import { CalendarIcon, UsersIcon, ClockIcon, MapPinIcon, CalendarDaysIcon } from "lucide-react";
 import toast from "react-hot-toast";
-import { dummyFeaturedRestaurants, dummyMyBookingsData } from "../assets/assets.ts";
+import { dummyFeaturedRestaurants } from "../assets/assets.ts";
+import api from '../lib/api.ts'
 
 export default function Dashboard() {
     const { user } = useAppContext();
@@ -16,13 +17,23 @@ export default function Dashboard() {
     const [bookings, setBookings] = useState<any[]>([]);
     const [recommendations, setRecommendations] = useState<any[]>([]);
     const [loadingBookings, setLoadingBookings] = useState(true);
+    const safeRecommendations = recommendations.filter(Boolean);
 
     // Fetch user bookings
     useEffect(() => {
         const fetchBookings = async () => {
-            setBookings(dummyMyBookingsData);
-            setLoadingBookings(false);
-        };
+
+           try{ setLoadingBookings(true);
+            const res=await api.get("/bookings/my")
+            setBookings(res.data);}
+
+        catch (error:any){
+            toast.error(error?.response?.data?.message || error?.message);
+
+        }finally{
+         setLoadingBookings(false)
+
+        }}
 
         if (user) {
             fetchBookings();
@@ -32,7 +43,13 @@ export default function Dashboard() {
     // Fetch generic recommendations
     useEffect(() => {
         const fetchRecommendations = async () => {
-            setRecommendations(dummyFeaturedRestaurants);
+            try{
+                const res=await api.get("/restaurants/featured")
+                setRecommendations(res.data)
+            }
+            catch(error:any){
+                toast.error(error?.response?.data?.message || error?.message);
+            }
         };
         fetchRecommendations();
     }, []);
@@ -43,7 +60,10 @@ export default function Dashboard() {
         }
 
         try {
-            setBookings((prev) => prev.map((b) => (b._id === bookingId ? { ...b, status: "cancelled" } : b)));
+            await api.delete(`/bookings/${bookingId}/cancel`)
+            // Update local state
+            setBookings((prev)=>prev.map((b)=>(b._id === bookingId ? {...b, status:"cancelled"}:b)))
+
             toast.success("Reservation cancelled successfully.");
         } catch (error: any) {
             toast.error(error?.response?.data?.message || error?.message);
@@ -220,11 +240,11 @@ export default function Dashboard() {
                     </div>
 
                     {/* Recommendations Section */}
-                    {recommendations.length > 0 && (
+                    {safeRecommendations.length > 0 && (
                         <div className="space-y-4 pt-10 border-t border-outline-variant/10">
                             <h3 className="font-display text-lg font-medium text-primary">Recommended for You</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {recommendations.slice(0, 3).map((r) => (
+                                {safeRecommendations.slice(0, 3).map((r) => (
                                     <RestaurantCard key={r._id} restaurant={r} />
                                 ))}
                             </div>
