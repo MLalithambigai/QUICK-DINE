@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-let rawBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+let rawBaseURL = import.meta.env.VITE_API_URL || 'https://quick-dine-ruddy.vercel.app/api';
+
+// Fallback/auto-correct if an outdated server URL was configured in Vercel environment variables
+if (rawBaseURL.includes('quick-dine-server.vercel.app')) {
+  rawBaseURL = rawBaseURL.replace('quick-dine-server.vercel.app', 'quick-dine-ruddy.vercel.app');
+}
 
 // Auto-upgrade insecure http:// to https:// in production to prevent Mixed Content errors
 if (
